@@ -7,7 +7,8 @@
     "require": {
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^3.2",
-        "filament/filament": "3.2.57",
+        "filament/filament": "3.2.92",
+        "humaidem/filament-map-picker": "^0.1.5",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9"
     },

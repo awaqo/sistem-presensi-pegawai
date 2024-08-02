@@ -13,43 +13,66 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Auth;
 
 class ScheduleResource extends Resource
 {
     protected static ?string $model = Schedule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-calendar-date-range';
+
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->options(User::all()->pluck('name', 'id'))
-                    ->searchable()
-                    ->required(),
-                Forms\Components\Select::make('shift_id')
-                    ->relationship('shift', 'name')
-                    ->required(),
-                Forms\Components\Select::make('office_id')
-                    ->relationship('office', 'name')
-                    ->required(),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\Select::make('user_id')
+                                    ->relationship('user', 'name')
+                                    ->options(User::all()->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->required(),
+                                Forms\Components\Select::make('office_id')
+                                    ->relationship('office', 'name')
+                                    ->required(),
+                                Forms\Components\Select::make('shift_id')
+                                    ->relationship('shift', 'name')
+                                    ->required(),
+                                Forms\Components\Toggle::make('is_wfa'),
+                            ]) 
+                    ])
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $is_super_admin = Auth::user()->hasRole('Super Admin');
+
+                if (!$is_super_admin) {
+                    $query->where('user_id', Auth::user()->id);
+                }
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
+                    ->label('Name')
+                    ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('Email')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\BooleanColumn::make('is_wfa')
+                    ->label('WFA'),
                 Tables\Columns\TextColumn::make('shift.name')
-                    ->numeric()
+                    ->description(fn (Schedule $record): string => $record->shift->start_time.' - '.$record->shift->end_time)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('office.name')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
