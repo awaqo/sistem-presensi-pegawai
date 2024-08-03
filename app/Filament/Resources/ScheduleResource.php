@@ -42,7 +42,8 @@ class ScheduleResource extends Resource
                                 Forms\Components\Select::make('shift_id')
                                     ->relationship('shift', 'name')
                                     ->required(),
-                                Forms\Components\Toggle::make('is_wfa'),
+                                Forms\Components\Toggle::make('is_wfa')
+                                    ->label('WFA'),
                             ]) 
                     ])
             ]);

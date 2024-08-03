@@ -20,6 +20,8 @@ class OfficeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
+    protected static ?int $navigationSort = 1;
+
     public static function form(Form $form): Form
     {
         return $form
@@ -69,7 +71,7 @@ class OfficeResource extends Resource
                                                 $set('latitude', $state['lat']);
                                                 $set('longitude', $state['lng']);
                                             })
-                                            ->tilesUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
+                                            ->tilesUrl('https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
                                         
                                     ])
                             ])->columns(2),
